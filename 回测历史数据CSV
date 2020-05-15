@@ -1,0 +1,39 @@
+便用新浪期货商品期货免费API接口（目前已停用），也可以用米筐RQ的专业（tick\bar）历史数据
+
+以菜粕各周期的JSON接口API为例
+5分钟：http://stock2.finance.sina.com.cn/futures/api/json.php/IndexService.getInnerFuturesMiniKLine5m?symbol=rm2009
+15分钟：http://stock2.finance.sina.com.cn/futures/api/json.php/IndexService.getInnerFuturesMiniKLine15m?symbol=rm2009
+30分钟：http://stock2.finance.sina.com.cn/futures/api/json.php/IndexService.getInnerFuturesMiniKLine30m?symbol=rm2009
+60分钟：http://stock2.finance.sina.com.cn/futures/api/json.php/IndexService.getInnerFuturesMiniKLine60m?symbol=rm2009
+日K线：http://stock2.finance.sina.com.cn/futures/api/json.php/IndexService.getInnerFuturesDailyKLine?symbol=rm2009
+
+--转换15分钟周期--
+from urllib import request
+import json
+
+def get_data(id):
+    url_15m = 'http://stock2.finance.sina.com.cn/futures/api/json.php/IndexService.getInnerFuturesMiniKLine15m?symbol=rm2009'
+    url = url_15m + id
+    req = request.Request(url)
+    rsp = request.urlopen(req)
+    res = rsp.read()
+    res_json = json.loads(res)
+
+
+    bar_list = []
+
+    res_json.reverse()
+    for line in res_json:
+        bar = {}
+        bar['date'] = line[0]
+        bar['open'] = float(line[1])
+        bar['high'] = float(line[2])
+        bar['low'] = float(line[3])
+        bar['close'] = float(line[4])
+        bar['vol'] = int(line[5])
+        bar_list.append(bar)
+
+    print(bar_list)
+
+if __name__ == '__main__':
+    get_data('rm2009')
